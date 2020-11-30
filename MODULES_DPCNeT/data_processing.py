@@ -126,17 +126,26 @@ def load_disk_images(dataset, X_res, Y_res, Type):
 
     print("[INFO] Loading images from {} data..".format(Type))
     images = []
-    for image_path in dataset["file"]:
-#         print(image_path)
-        imagePath = image_path
-        # print(image_path)
-        image = cv2.imread(imagePath)  # read the image corresponding to the path
-        # cropping the image
+    for image_path in dataset["file"]:    
+
+        # dimensions for cropping the image
         left = 44
         top = 44
         right = 556
-        bottom = 556
+        bottom = 556    
+        ## read the image corresponding to the path
+        try:
+            imagePath = image_path ## for regular code 
+            # imagePath = '..'+image_path[33:] ## when reading path from the ones gnerated in COLAB as the address in COLAB gets modified
+            image = cv2.imread(imagePath)  
+            crop_image = image[left:right, top:bottom]
+        except TypeError:
+            imagePath = '..'+image_path[33:] ## when reading path from the ones gnerated in COLAB as the address in COLAB gets modified
+            image = cv2.imread(imagePath) 
+            crop_image = image[left:right, top:bottom]
+        
         crop_image = image[left:right, top:bottom]
+
         crop_image = cv2.resize(crop_image, (X_res, Y_res))  # downsizing the image
         images.append(crop_image)
     print("{} Images are loaded".format(Type))
