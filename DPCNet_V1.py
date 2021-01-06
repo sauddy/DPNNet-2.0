@@ -89,7 +89,7 @@ try: ## tries to find the modules in the local directory first
   import other_cnns as ocn
 
   ########### Folders to save the processed data, files and figures when using Local computer ##############
-  output_folder_list = ['data_folder1','figures1','saved_model1']
+  output_folder_list = ['data_folder','figures','saved_model']
   for file in output_folder_list:
     try:
         os.makedirs(file)
