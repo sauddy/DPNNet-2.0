@@ -116,6 +116,41 @@ def process_the_disk_attributes(train, test, path):
     print("[INFO] Done...")
     return normed_train_data, normed_test_data, train_labels, test_labels
 
+def process_data_for_test(test, path):
+
+    ''' 
+    ### ADDED ON 7 JANUARY TO TEST DPCNET ON HIGH MASS DATA####
+
+        Input : CSV containing data and path to the image
+        path : to get the stat files from the original trained data
+        Output : Return normalized data (z normalization is used)
+    '''
+
+    print("[INFO] preparing the normalized data TEST...")
+    try: 
+        # train  = train.drop(columns=['Sample#', 'file']) ## dropping the necessary files
+        test   = test.drop(columns=['Sample#', 'file']) ## dropping the necessary files
+    except KeyError :
+        pass
+    
+    
+
+    train_stats = pd.read_csv(path+'data_folder/train_stats.csv',index_col=0)
+    # print(train_stats)
+    ## The labels are not normalized
+    
+    test_labels = test.pop("Planet_Mass")
+
+
+    def norm(x):
+        return (x - train_stats['mean']) / train_stats['std']
+    
+
+    normed_test_data = norm(test)
+#     print(normed_train_data)
+    print("[INFO] Done...")
+    return normed_test_data, test_labels
+
 
 
 def load_disk_images(dataset, X_res, Y_res, Type):
@@ -147,16 +182,19 @@ def load_disk_images(dataset, X_res, Y_res, Type):
         crop_image = image[left:right, top:bottom]
 
         crop_image = cv2.resize(crop_image, (X_res, Y_res))  # downsizing the image
+        crop_image = crop_image/255.0 # scaling
         images.append(crop_image)
     print("{} Images are loaded".format(Type))
     return np.array(images)
 
 
-def plot_history(history, path, Model):
+
+
+def plot_history(history, path, Model,Network= None,res =None):
     try:
         hist = pd.DataFrame(history.history) ## is the data asalready a dataframe no need to convert
         path1 = path+'figures'
-    except AttributeError: 
+    except AttributeError:
         hist = history
         path1 = path+'figures_paper'
     hist['epoch'] = hist.index
@@ -170,21 +208,28 @@ def plot_history(history, path, Model):
              label='Val Error')
     plt.ylim([0, 30])
     plt.legend()
-
+    
     if Model == 'CNN':
-        plt.title("CNN Model")
-        plt.savefig(path1+'/MAEvalidation_loss_CNN.pdf', format='pdf', dpi=300) 
+        plt.title("Single-input DPCNet")
+        if Network == None:
+           plt.savefig(path1+'/MAEvalidation_loss_CNN.pdf', format='pdf', dpi=300)
+        else:
+           plt.savefig(path1+'/MAEvalidation_loss_{}_{}.pdf'.format(Network,str(res)), format='pdf', dpi=300)
     else:
-        plt.title("Hybrid Model")
-        plt.savefig(path1+'/MAEvalidation_loss_Hybrid.pdf', format='pdf', dpi=300)
-        
+        plt.title("Multi-input DPCNet")
+        if Network == None:
+           plt.savefig(path1+'/MAEvalidation_loss_hybrid.pdf', format='pdf', dpi=300)
+        else:
+           plt.savefig(path1+'/MAEvalidation_loss_{}_{}_hybrid.pdf'.format(Network,str(res)), format='pdf', dpi=300)
+       # plt.savefig(path1+'/MAEvalidation_loss_Hybrid.pdf', format='pdf', dpi=300)
+
     plt.figure(figsize=(5, 5))
     plt.xlabel('Epoch')
     plt.ylabel('Mean Square Error ($M_\oplus^2$)')
     plt.plot(hist['epoch'], hist['mean_squared_error'],
              label='Train')
     plt.plot(hist['epoch'], hist['val_mean_squared_error'],
-             label='Validation ')
+                 label='Validation ')
     plt.ylim([0, 600])
     #   plt.xlim([0,700])
     #   plt.yscale("log")
@@ -194,10 +239,19 @@ def plot_history(history, path, Model):
     plt.tick_params(axis='both', which='minor', length=3, width=1.3)
     plt.tight_layout()
     if Model == 'CNN':
-        plt.title("CNN Model")  
-        plt.savefig(path1+'/MSEvalidation_loss_CNN.pdf', format='pdf', dpi=300)     
+        plt.title("Single-input DPCNet")
+        if Network == None:
+           plt.savefig(path1+'/MSEvalidation_loss_CNN.pdf', format='pdf', dpi=300)
+        else:
+           plt.savefig(path1+'/MSEvalidation_loss_{}_{}.pdf'.format(Network,str(res)), format='pdf', dpi=300)
+       # plt.savefig(path1+'/MSEvalidation_loss_CNN.pdf', format='pdf', dpi=300)     
     else:
-        plt.title("Hybrid Model")
-        plt.savefig(path1+'/MSEvalidation_loss_Hybrid.pdf', format='pdf', dpi=300)
-        
+        plt.title("Multi-input DPCNet")
+        if Network == None:
+           plt.savefig(path1+'/MSEvalidation_loss_hybrid.pdf', format='pdf', dpi=300)
+        else:
+           plt.savefig(path1+'/MSEvalidation_loss_{}_{}_hybrid.pdf'.format(Network,str(res)), format='pdf', dpi=300)
+        #plt.savefig(path1+'/MSEvalidation_loss_Hybrid.pdf', format='pdf', dpi=300)
+
     plt.show()
+
