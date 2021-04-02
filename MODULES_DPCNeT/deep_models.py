@@ -72,6 +72,7 @@ def build_cnn(width, height, depth, filters=(16, 32, 64, 128), regress=False):
 
     # check to see if the regression node should be added
     if regress:
+        
         #         x = Dense(1, activation="linear")(x)
         x = Dense(1, activation="linear")(x)
 

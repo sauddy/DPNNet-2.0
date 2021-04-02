@@ -243,7 +243,7 @@ def convolutional_block(X, f, filters, stage, block, s = 2):
     
     return X
 
-def ResNet50(width, height, depth):
+def ResNet50(width, height, depth,regress=False):
     """
     Implementation of the popular ResNet50 the following architecture:
     CONV2D -> BATCHNORM -> RELU -> MAXPOOL -> CONVBLOCK -> IDBLOCK*2 -> CONVBLOCK -> IDBLOCK*3
@@ -305,11 +305,26 @@ def ResNet50(width, height, depth):
     X = AveragePooling2D(pool_size=(2,2), name='avg_pool')(X)
     
 
-    # output layer
+    # # output layer
+    # X = Flatten()(X)
+    # X = Dense(1, activation='linear', name='fc', kernel_initializer = glorot_uniform(seed=0))(X)
+    
+
+    ## made the changes on 15 Feb 2021
     X = Flatten()(X)
-    X = Dense(1, activation='linear', name='fc', kernel_initializer = glorot_uniform(seed=0))(X)
-    
-    
+    # X = Dense(4)(X)
+    # X = Activation("relu")(X)
+
+    # output layer
+    if regress == True:
+   # X = Flatten()(X)
+        print("Single-input is initiated") 
+        X = Dense(1, activation='linear', name='fc', kernel_initializer = glorot_uniform(seed=0))(X)
+    else:
+        print("Multi-input is initiated")
+        X = Dense(4)(X)
+        X = Activation("relu")(X)
+
     # Create model
     modelresnet = Model(inputs = X_input, outputs = X)
 

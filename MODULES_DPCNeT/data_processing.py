@@ -6,7 +6,7 @@ import glob
 import cv2
 import os
 import matplotlib.pyplot as plt
-
+from tensorflow import keras as k
 print("We are currently using the Modules_DPCNet")
 
 
@@ -175,6 +175,7 @@ def load_disk_images(dataset, X_res, Y_res, Type):
             image = cv2.imread(imagePath)  
             crop_image = image[left:right, top:bottom]
         except TypeError:
+            print("you may need to specify the correct path to the images")
             imagePath = '..'+image_path[33:] ## when reading path from the ones gnerated in COLAB as the address in COLAB gets modified
             image = cv2.imread(imagePath) 
             crop_image = image[left:right, top:bottom]
@@ -182,7 +183,12 @@ def load_disk_images(dataset, X_res, Y_res, Type):
         crop_image = image[left:right, top:bottom]
 
         crop_image = cv2.resize(crop_image, (X_res, Y_res))  # downsizing the image
-        crop_image = crop_image/255.0 # scaling
+        # crop_image = crop_image/255.0 # scaling
+
+        ## ADDED for image normalization (standadization) on 31 Jan 2021
+        crop_image = k.preprocessing.image.img_to_array(crop_image) ## changing to numpy array
+        datagen = k.preprocessing.image.ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True,rescale= 1.0/255.0)
+        crop_image = datagen.standardize(np.copy(crop_image))
         images.append(crop_image)
     print("{} Images are loaded".format(Type))
     return np.array(images)
