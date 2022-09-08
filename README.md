@@ -1,3 +1,4 @@
+
 # DPNNet-2.0
 Disk Planet Convolutional Neural Network
 
@@ -5,3 +6,6 @@ We introduce the architecture of DPNNet-2.0, second in the series after DPNNet \
 
 The paper is accepted for publcation in Astrophysical Journal 
 The arXiv version is available at https://arxiv.org/abs/2107.09086
+
+![Disk_samples-white](https://user-images.githubusercontent.com/46558389/189010857-0513eeb8-0769-4ef6-aba2-b4521dbd0b9a.png)
+![DPCNet_hybrid](https://user-images.githubusercontent.com/46558389/189010859-d339d326-10b0-4b26-920e-3c7935d956d1.png)
